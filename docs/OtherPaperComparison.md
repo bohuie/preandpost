@@ -2,33 +2,33 @@
 
 | Metric / Concept | SonarQube Local Scanner | Beyond the Pull Request | Pre-Post AI Comparisons | Status | Notes / Limitation |
 |---|---|---|---|---|---|
-| **Security Domain** | ✅ | ✅ | Partially discussed | **Covered** | For spotting potential security weaknesses. |
+| **Security Domain** |  |  |  |  |  |
 | Vulnerabilities | ✅ | ✅ | ✅ Discussed as AI-code risk | **Covered** | To see if post-GenAI code has more potential security issues. |
 | Security Rating | ✅ | Not shown | Not directly | - | - |
 | Security Remediation Effort | ✅ | Not shown | Not directly | - | - |
-| **Reliability Domain** | ✅ | ✅ | Partially discussed | **Covered** | - |
+| **Reliability Domain** |  |  |  |  |  |
 | Bugs | ✅ | ✅ | ✅ discussed as AI-code risk | **Covered** | Measuring potential bugs/errors. |
 | Reliability Rating | ✅ | ✅ | Not directly | **Covered** | Static reliability, not real bugs at runtime. |
 | Reliability Remediation Effort | ✅ | Not shown | Not directly | - | - |
-| **Maintainability Domain** | ✅ | ✅ | ✅ Conceptually related | **Covered** | To connect SonarQube with the quality of student code. |
+| **Maintainability Domain** |  |  |  |  |  |
 | Maintainability Rating | ✅ | ✅ | Conceptually related | **Covered** | Can be related to branch naming or PR feature size. |
 | Code Smells | ✅ | ✅ | ✅ related to code style/fingerprint | **Covered** | For viewing maintainability issues. |
 | Debt | ✅ | Not shown | Not directly | - | - |
 | Debt Ratio | ✅ | Not shown | Not directly | - | - |
-| **Security Review Domain** | ✅ | Not shown | Not directly | - | - |
+| **Security Review Domain** |  |  |  |  |  |
 | Security Hotspots | ✅ | Not shown | Not directly | - | - |
 | Security Review Rating | ✅ | Not shown | Not directly | - | - |
 | Hotspots Reviewed | ✅ | Not shown | Not directly | - | - |
-| **Coverage Domain** | ✅ | Not shown | ✅ testing-related | **Partially covered** | If the test coverage report is integrated. |
+| **Coverage Domain** |  |  |  |  |  |
 | Lines to Cover | ✅ | Not shown | ✅ testing-related | **Partially covered** | Can show parts of code that are eligible for testing. |
 | Uncovered Lines | ✅ | Not shown | ✅ testing-related | **Partially covered** | - |
 | Line Coverage | ✅ | Not shown | ✅ testing habits | **Partially covered** | For testing analysis if test runner/report is available. |
-| **Duplications Domain** | ✅ | ✅ Duplicate tags/issues | ✅ DRY violation | **Covered** | Pre-Post AI fingerprint. |
+| **Duplications Domain** |  |  |  |  |  |
 | Duplication Density | ✅ | Not shown | ✅ related | **Covered** | To calculate DRY violations. |
 | Duplicated Lines | ✅ | Not shown | ✅ related | **Covered** | To see if AI-era code is more repetitive. |
 | Duplicated Blocks | ✅ | Not shown | ✅ related | **Covered** | Indicator for repeated logic. |
 | Duplicated Files | ✅ | Not shown | ✅ related | **Covered** | Can be influenced by template/framework files, so filtering is necessary. |
-| **Size Domain** | ✅ | ✅ | PR size/code size related | - | SonarQube gives repo/file size, but not PR-level size. |
+| **Size Domain** |  |  |  |  |  |
 | Lines of Code / ncloc | ✅ | ✅ | Not directly | - | - |
 | Lines | ✅ | Not shown | Not directly | - | - |
 | Statements | ✅ | Not shown | Not directly | - | - |
@@ -37,10 +37,10 @@
 | Files | ✅ | Not shown | PR/file-level related | - | SonarQube Files = total analyzed files, not Files Changed in PR. |
 | Comment Lines | ✅ | Not shown | ✅ documentation/comment density | **Covered** | Can measure comment density, but does not assess whether comments are meaningful. |
 | Comments (%) | ✅ | Not shown | Not directly | - | - |
-| **Complexity Domain** | ✅ | ✅ | ✅ related | **Covered** | - |
+| **Complexity Domain** |  |  |  |  |  |
 | Cyclomatic Complexity / Complexity | ✅ | ✅ | ✅ related | **Covered** | Measures the number of logic paths. |
 | Cognitive Complexity | ✅ | ✅ | ✅ related | **Covered** | Closer to human readability/understandability. |
-| **Issues by Severity** | ✅ | ✅ | Not directly | - | - |
+| **Issues Domain** |  |  |  |  |  |
 | Blocker Issues | ✅ | ✅ | Not directly | - | - |
 | Critical Issues | ✅ | ✅ | Not directly | - | - |
 | Major Issues | ✅ | ✅ | Not directly | - | - |
