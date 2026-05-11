@@ -1,0 +1,20 @@
+# Local environment variables / secrets
+.env
+
+# Cloned student repositories
+repos/
+
+# Generated SonarQube config files
+tmp_sonar_configs/
+
+# Generated output logs and CSV files
+data/outputs/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# macOS files
+.DS_Store
+
+*.log
