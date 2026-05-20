@@ -6,7 +6,7 @@ The **SonarQube quality model** is applied to an automated code review and analy
 - Maintainability (code smell)
 - Security (vulnerability)
 - Security Hotspot  
-  We exclude this category because security hotspots are not confirmed vulnerabilities. They indicate security-sensitive code that requires manual review to determine whether it is actually risky. Since this study requires automated and consistently comparable metrics across pre- and post-AI repositories, Security Hotspots are excluded from the core analysis.
+  We exclude this category because security hotspots are not confirmed vulnerabilities and require human review. They indicate security-sensitive code that requires manual review to determine whether it is actually risky. Since this study requires automated and consistently comparable metrics across pre- and post-AI repositories, Security Hotspots are excluded from the core analysis.
 
 In this context, a **finding** refers to an individual issue detected by SonarQube in the source code. Each finding has a type, such as Bug, Vulnerability, or Code Smell, and contributes to the corresponding metric count.
 
