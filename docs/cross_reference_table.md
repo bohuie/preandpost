@@ -648,7 +648,7 @@ if (condition);
 
 ## Coverage
 
-| Metric / Concept | Definition | Beyond PR | Pre-Post AI | BRIDGES | Code Review Smells | Code Quality | Metric | SonarQube |
+| Metric | Definition | Beyond PR | Pre-Post AI | BRIDGES | Code Review Smells | Code Quality | Metrics Paper | SonarQube |
 |---|---|---|---|---|---|---|---|---|
 | Lines to Cover | The number of lines of code that could be covered by unit tests, e.g., blank lines or full comment lines are not considered as lines to cover. | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
 | Uncovered Lines | The number of conditions that are not covered by unit tests. | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
@@ -685,7 +685,7 @@ if (condition);
 
 ## Code Change
 
-| Metric / Concept | Definition | Beyond PR | Pre-Post AI | BRIDGES | Code Review Smells | Code Quality | Metric | SonarQube |
+| Metric | Definition | Beyond PR | Pre-Post AI | BRIDGES | Code Review Smells | Code Quality | Metrics Paper | SonarQube |
 |---|---|---|---|---|---|---|---|---|
 | Additions | Measures the number of lines added in a PR or commit. | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ |
 | Deletions | Measures the number of lines deleted in a PR or commit. | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ |
@@ -742,7 +742,7 @@ if (condition);
 
 ## PR Practices (Programming Behavior)
 
-| Metric / Concept | Definition | Beyond PR | Pre-Post AI | BRIDGES | Code Review Smells | Code Quality | Metric | SonarQube |
+| Metric | Definition | Beyond PR | Pre-Post AI | BRIDGES | Code Review Smells | Code Quality | Metrics Paper | SonarQube |
 |---|---|---|---|---|---|---|---|---|
 | PR Description | - Ideal Behavior: Purpose, changes, test steps included.<br>- Non-Ideal Behavior: Empty or minimal PR description.<br><br>- Code Review Smell: Missing Context | ❌ | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ |
 | PR Accepted / Merged | Measures whether a pull request was successfully merged into the target branch. | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
@@ -859,7 +859,7 @@ if (condition);
 
 ## Branching (Programming Behavior)
 
-| Metric / Concept | Definition | Beyond PR | Pre-Post AI | BRIDGES | Code Review Smells | Code Quality | Metric | SonarQube |
+| Metric | Definition | Beyond PR | Pre-Post AI | BRIDGES | Code Review Smells | Code Quality | Metrics Paper | SonarQube |
 |---|---|---|---|---|---|---|---|---|
 | Branch Naming | - Ideal Behavior: Descriptive and Meaningful Branch Name, e.g., feat, login.<br>- Non-Ideal Behavior: Random Branch Name/Generic Names, e.g., developer’s own name, bug, test, new.<br>- Code Review Smell: Missing context | ❌ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ |
 | Branching Strategy | - Ideal Behavior: One Feature Per Branch.<br>- Non-Ideal Behavior: Multiple Features Per Branch. | ❌ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ |
@@ -899,7 +899,7 @@ if (condition);
 
 ## Code Structure
 
-| Metric / Concept | Definition | Beyond PR | Pre-Post AI | BRIDGES | Code Review Smells | Code Quality | Metric | SonarQube |
+| Metric | Definition | Beyond PR | Pre-Post AI | BRIDGES | Code Review Smells | Code Quality | Metrics Paper | SonarQube |
 |---|---|---|---|---|---|---|---|---|
 | Feature/Refactor Code Size | - Ideal Behavior: Small Feature/Small code commits or Small Refactor/Incremental refactor commits.<br>- Non-Ideal Behavior: Large Feature/Large code commits or Large Refactors.<br>- Code review smell: Large Changesets | ❌ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ |
 | Keep repository up-to-date | - Ideal Behavior: Pulling latest changes.<br>- Non-Ideal Behavior: Ignoring merge conflicts. | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ |
@@ -963,7 +963,7 @@ if (condition);
 
 ## Coding Style / AI-Generated Looks Like
 
-| Metric / Concept | Definition | Beyond PR | Pre-Post AI | BRIDGES | Code Review Smells | Code Quality | Metric | SonarQube |
+| Metric | Definition | Beyond PR | Pre-Post AI | BRIDGES | Code Review Smells | Code Quality | Metrics Paper | SonarQube |
 |---|---|---|---|---|---|---|---|---|
 | Verbose, Descriptive Identifier Naming | - AI: Long, self-explanatory, and full descriptive identifiers within function bodies: temporary variables, loop counters, and intermediate results.<br>- Human: Names get shortened, abbreviated, and use different naming styles in different files. | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | High Comment and Documentation Density | - AI: AI-generated functions tend to come with a docstring with one-line summary, an Args block, a Returns block, and sometimes a Raises block. Inline comments restate what the next line does in slightly more verbose language.<br>- Human: Comments are sparse, sometimes outdated, and clustered around the parts the author actually found tricky rather than spread evenly across all functions. Tend to encode context that lives nowhere else in the code: ticket numbers, references to deprecated APIs, a quick note on why the obvious approach was skipped. | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
@@ -1023,7 +1023,7 @@ if (condition);
 
 ## AI Detection
 
-| Metric / Concept | Definition | Beyond PR | Pre-Post AI | BRIDGES | Code Review Smells | Code Quality | Metric | SonarQube |
+| Metric | Definition | Beyond PR | Pre-Post AI | BRIDGES | Code Review Smells | Code Quality | Metrics Paper | SonarQube |
 |---|---|---|---|---|---|---|---|---|
 | Binoculars | Uses two related LLMs, an observer and a performer, to score whether code looks AI-generated. If the two models strongly agree on what tokens are likely to come next, the code is treated as more AI-like. If the observer is more surprised while the performer is not, the code is treated as more human-like. | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | File-level AI Density | Measures the proportion of files in a repository that are classified as AI-like. | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
@@ -1094,7 +1094,7 @@ Compare File-level AI Density percentage across repositories or teams.
 
 ## Balanced Work
 
-| Metric / Concept | Definition | Beyond PR | Pre-Post AI | BRIDGES | Code Review Smells | Code Quality | Metric | SonarQube |
+| Metric | Definition | Beyond PR | Pre-Post AI | BRIDGES | Code Review Smells | Code Quality | Metrics Paper | SonarQube |
 |---|---|---|---|---|---|---|---|---|
 | Review Buddies / Proactive Code Reviews | The author assigns the same reviewer(s).<br>- Ideal Behavior: Different members serve as first and second reviewers at different times.<br>- Non-Ideal Behavior: Certain individuals consistently serve as the first or the second reviewer. | ❌ | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ |
 | Ping-pong | Excessively long loops between author and reviewer. When the reviewer requests the author to make some additional changes on the code changeset, the author is supposed to update their changeset by considering the requests of the reviewer. The loop between the author and reviewer continues until the reviewer is satisfied with the changeset and approves that it is ready to be merged to the codebase. | ❌ | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ |
