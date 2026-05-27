@@ -6,6 +6,7 @@
 |---|---|---|---|---|---|---|---|---|
 | Security / Vulnerabilities | **Is the rule about code that could be exploited by an attacker?** If yes, then it is a vulnerability rule.<br>- Pre-Post AI: Discusses **security vulnerabilities** as one AI-generated code looks like, e.g., insecure patterns such as SQL injection. | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ✅ |
 | Security Rating | A - E rating based on the severity of detected vulnerabilities. A = 0 Vulnerabilities, B = at least 1 Minor Vulnerability, C = at least 1 Major Vulnerability, D = at least 1 Critical Vulnerability, E = at least 1 Blocker Vulnerability. | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ |
+| Bandit | A Python security static analysis tool that detects potential security issues and reports them by severity level: high, medium, and low. The metric can be computed as the change in Bandit issues before and after edits. | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ |
 
 ### How to detect
 
@@ -33,6 +34,27 @@ Severity categories:
 - Major: An issue with a medium impact on the application.
 - Critical: An issue with a high impact on the application that should be fixed as soon as possible.
 - Blocker: An issue that has a significant probability of severe unintended consequences on the application that should be fixed immediately.
+
+#### Bandit
+
+1. Collect all Python files included in the analysis.
+2. Run Bandit on the selected Python files.
+3. Bandit detects potential security issues, such as hardcoded secrets, unsafe subprocess calls, weak cryptography, insecure deserialization, SQL injection risks, or unsafe file handling.
+4. Group the detected issues by severity level:
+   - High
+   - Medium
+   - Low
+5. Count the number of Bandit issues for each severity level.
+6. If comparing pre- and post-edit code, calculate the delta for each severity level:
+
+   `ΔBandit_s = Σ Issues_post_s(f) - Σ Issues_pre_s(f)`
+
+   where `s ∈ {high, medium, low}`.
+
+7. Interpret the result:
+   - If `ΔBandit_s > 0`, the edits introduced more security issues at severity level `s`.
+   - If `ΔBandit_s < 0`, the edits reduced security issues at severity level `s`.
+   - If `ΔBandit_s = 0`, there was no change in Bandit issues for that severity level.
 
 
 ## Reliability
@@ -66,7 +88,7 @@ Reliability Rating is categorized based on the severity of detected bugs:
 
 | Metric | Definition | Beyond PR | Pre-Post AI | BRIDGES | Code Review Smells | Code Quality | Metrics Paper | SonarQube |
 |---|---|---|---|---|---|---|---|---|
-| Maintainability / Code Smells | **Is the rule neither a bug nor a vulnerability?** If yes, then it’s a code smell rule. It aggregates structural characteristics, lines of code, complexity, and comment density, into a single interpretable score where higher values denote easier maintainability. | ✅ | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ |
+| Maintainability Index / Code Smells | **Is the rule neither a bug nor a vulnerability?** If yes, then it’s a code smell rule. It aggregates structural characteristics, lines of code, complexity, and comment density, into a single interpretable score where higher values denote easier maintainability. | ✅ | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ |
 | Debt | A measure of effort to fix all code smells, in minutes. An 8-hour day is assumed when values are shown in days, `1 day = 8 working hours`.<br>- BeyondPR: Refers to the future cost of maintaining or fixing code caused by maintainability problems such as code smells, complexity, and design compromises tags. | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
 | Debt Ratio | The ratio between the cost to develop the software and the cost to fix it. Formula: `Debt Ratio = Remediation Cost (estimated time to fix code smells) / Development Cost (cost to develop 1 line of code * Number of lines of code).`<br><br>*Cost to develop 1 line of code = 0.06 days, approximately 30 minutes. | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
 | Maintainability Rating | The rating given to the project relative to the value of the debt ratio: A = 0-0.05, B = 0.06-0.1, C = 0.11-0.20, D = 0.21-0.5, E = 0.51-1. | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
@@ -653,6 +675,7 @@ if (condition);
 | Lines to Cover | The number of lines of code that could be covered by unit tests, e.g., blank lines or full comment lines are not considered as lines to cover. | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
 | Uncovered Lines | The number of conditions that are not covered by unit tests. | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
 | Line Coverage | On a given line of code, Line coverage simply answers the question ‘Has this line of code been executed during the execution of the unit tests?’. It is the density of covered lines by unit tests. | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
+| Functional Correctness | Measures whether the generated code produces the expected outputs for the benchmark’s test cases. For each problem instance, correctness is binary: 1 if all tests pass, and 0 otherwise. | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ |
 
 ### How to detect
 
@@ -682,6 +705,15 @@ if (condition);
 
    `Line Coverage = covered_lines / lines_to_cover * 100`
 
+### Functional Correctness
+1. Run the generated code using the benchmark’s official evaluation harness or test suite.
+2. Check whether the code passes all required test cases.
+3. If all test cases pass, assign:
+    `Functional Correctness = 1`
+4. If one or more test cases fail, assign:
+    `Functional Correctness = 0`
+5. For multiple problem instances, calculate the overall correctness rate:
+    `Correctness Rate = number_of_correct_solutions / total_problem_instances * 100`
 
 ## Code Change
 
@@ -692,6 +724,7 @@ if (condition);
 | Changes / Lines Modified | Measures the total number of lines modified in a PR or commit, usually additions + deletions.<br>- Pre-Post AI: PR Size / Change Size<br><br>- Code Review Smell: Large Changesets. The changeset is too large to be reviewed. | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ |
 | Elevated Code Churn | - AI: AI-authored lines are more likely to be removed, reverted, or heavily rewritten shortly after being committed.<br>- Human: Human-authored lines tend to remain more stable for longer after commit. | ❌ | ✅ | ❌ | ✅ | ❌ | ❌ | ❌ |
 | Files Changed per PR | Measures the number of files modified in a PR. | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ |
+| Multi-File Metric Aggregation for SWE-bench Verified | Aggregates metric differences across multiple modified files by comparing pre-patch and post-patch code. It measures the delta (Δ) between before and after versions to isolate changes caused by generated edits. | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ |
 
 ### How to detect
 
@@ -739,6 +772,22 @@ if (condition);
 4. Sum the total number of changed files:
 
    `Files Changed per PR = count of unique files modified in the PR`
+
+#### Multi-File Metric Aggregation for SWE-bench Verified
+
+1. Identify all files modified by the generated patch.
+2. Compute the selected metric on the pre-patch version of the modified files.
+3. Apply the patch or use the post-patch version of the same files.
+4. Compute the same metric again on the post-patch version.
+5. Aggregate metric values across all modified files.
+6. Calculate the metric difference:
+
+   `Δ metric = metric_post - metric_pre`
+
+7. Use the delta value to isolate the change caused by the generated edit.
+8. Interpret the result based on the metric:
+   - For metrics where lower is better, such as bugs, vulnerabilities, code smells, or complexity, a negative delta indicates improvement.
+   - For metrics where higher is better, such as maintainability score, PyLint score, or functional correctness, a positive delta indicates improvement.
 
 ## PR Practices (Programming Behavior)
 
@@ -965,10 +1014,10 @@ if (condition);
 
 | Metric | Definition | Beyond PR | Pre-Post AI | BRIDGES | Code Review Smells | Code Quality | Metrics Paper | SonarQube |
 |---|---|---|---|---|---|---|---|---|
-| Verbose, Descriptive Identifier Naming | - AI: Long, self-explanatory, and full descriptive identifiers within function bodies: temporary variables, loop counters, and intermediate results.<br>- Human: Names get shortened, abbreviated, and use different naming styles in different files. | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| High Comment and Documentation Density | - AI: AI-generated functions tend to come with a docstring with one-line summary, an Args block, a Returns block, and sometimes a Raises block. Inline comments restate what the next line does in slightly more verbose language.<br>- Human: Comments are sparse, sometimes outdated, and clustered around the parts the author actually found tricky rather than spread evenly across all functions. Tend to encode context that lives nowhere else in the code: ticket numbers, references to deprecated APIs, a quick note on why the obvious approach was skipped. | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Consistent Whitespace and Indentation | - AI: Produces highly consistent indentation, blank-line spacing, and spacing around operators, often resembling code that has been formatted by a linter.<br>- Human: Formatting may drift across files or functions, such as inconsistent blank lines, spacing, or indentation styles that are still tolerated by linters. | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Hyper-consistent Error Handling | - AI: Often wraps functions in highly structured try/except blocks, catches multiple specific exceptions, logs each error with formatted messages, and re-raises them even when not needed.<br>- Human: Error handling is usually less uniform and more context-dependent, with some functions catching no exceptions and others catching only relevant errors. | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Verbose, Descriptive Identifier Naming | - AI: Long, self-explanatory, and full descriptive identifiers within function bodies: temporary variables, loop counters, and intermediate results.<br>- Human: Names get shortened, abbreviated, and use different naming styles in different files. | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| High Comment and Documentation Density | - AI: AI-generated functions tend to come with a docstring with one-line summary, an Args block, a Returns block, and sometimes a Raises block. Inline comments restate what the next line does in slightly more verbose language.<br>- Human: Comments are sparse, sometimes outdated, and clustered around the parts the author actually found tricky rather than spread evenly across all functions. Tend to encode context that lives nowhere else in the code: ticket numbers, references to deprecated APIs, a quick note on why the obvious approach was skipped. | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Consistent Whitespace and Indentation | - AI: Produces highly consistent indentation, blank-line spacing, and spacing around operators, often resembling code that has been formatted by a linter.<br>- Human: Formatting may drift across files or functions, such as inconsistent blank lines, spacing, or indentation styles that are still tolerated by linters. | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Hyper-consistent Error Handling | - AI: Often wraps functions in highly structured try/except blocks, catches multiple specific exceptions, logs each error with formatted messages, and re-raises them even when not needed.<br>- Human: Error handling is usually less uniform and more context-dependent, with some functions catching no exceptions and others catching only relevant errors. | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 
 ### How to detect
 
@@ -976,14 +1025,26 @@ if (condition);
 
 1. Extract identifier names from the source code, including function names, method names, variable names, loop counters, temporary variables, class names, and intermediate result variables.
 2. Calculate identifier-level features, such as average identifier length, median identifier length, number of words/tokens per identifier, percentage of long identifiers, percentage of abbreviated identifiers, and consistency of naming style across files.
-3. Classify identifiers as verbose/descriptive if they are long, self-explanatory, and composed of multiple meaningful words, e.g., `calculate_average_transaction_value`, `number_of_successful_transactions`, `temporary_user_profile_response`.
+3. Use the following threshold to classify a long descriptive identifier:
+   - Identifier length ≥ 20 characters, or
+   - Identifier contains ≥ 3 meaningful word tokens.
+
+   For example:
+   - `number_of_successful_transactions` → verbose/descriptive
+   - `calculateAverageTransactionValue` → verbose/descriptive
+   - `temporary_user_profile_response` → verbose/descriptive
 4. Classify identifiers as short/abbreviated if they use shortened or compact names, e.g., `avg_txn`, `tmp`, `usr`, `i`, `res`.
-5. Compare naming patterns across files or repositories.
+5. Use the following threshold to classify abbreviated identifiers:
+   - Identifier length ≤ 5 characters
 6. Calculate a score such as:
 
    `Verbose Identifier Rate = long_descriptive_identifiers / total_identifiers * 100`
 
-7. If the verbose identifier rate is unusually high, the code may show the Verbose, Descriptive Identifier Naming AI-like pattern.
+7. Classify the code as showing verbose/descriptive identifier naming if:
+
+   `Verbose Identifier Rate ≥ 30%`
+
+8. If the verbose identifier rate is high across many files, the code may show an AI-like naming pattern.
 
 #### High Comment and Documentation Density
 
