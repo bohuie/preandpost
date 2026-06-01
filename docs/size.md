@@ -14,16 +14,22 @@ The following metrics are included:
 
 ## Folder Structure
 ```bash
-Folder Structure
 preandpost/
 ├── src/
+│   ├── clone_repos.py              # Clone repositories for analysis
+│   └── run_size.py                 # Run Size metric detector
 │   └── metrics/
-│       └── size.py                 # Size metric extraction logic
-├── scripts/
-│   └── run_size.py                 # Run Size metric extraction
-└── tests/
+        ├── __init__.py 
+│       └── size.py                 # Size metric detector
+├── tests/
 │   └── test_size.py                # Unit tests
 └── data/
+    ├── repos/                       # Cloned repositories 
+    │   ├── <REPO_OWNER_1>/
+    │   │   ├── <REPO_NAME_1>/
+    │   │   └── <REPO_NAME_2>/
+    │   └── <REPO_OWNER_2>/
+    │       └── <REPO_NAME_3>/
     └── outputs/                     # Generated outputs 
         └── size/
             ├── files_summary.csv    # File-level metrics
@@ -456,7 +462,7 @@ The scanner:
 - Computes metrics for each supported source file;
 - Aggregates file-level metrics into repository-level results.
 
-### `scripts/run_size.py`
+### `src/run_size.py`
 
 Runs Size metric extraction on the configured cloned repositories.
 
@@ -528,13 +534,13 @@ This implementation uses a line-based approximation. Some metrics may not be det
 Run the unit tests:
 
 ```bash
-PYTHONPATH=. python -m pytest tests/test_size.py -v
+python -m pytest tests/test_size.py -v
 ```
 
 Run the script:
 
 ```bash
-PYTHONPATH=. python scripts/run_size.py
+python scripts/run_size.py
 ```
 
 # Metric Size Calculation
