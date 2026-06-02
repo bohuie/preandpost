@@ -569,7 +569,7 @@ python -m pytest tests/test_size.py -v
 Run the script:
 
 ```bash
-python scripts/run_size.py
+python src/run_size.py
 ```
 
 # Metric Size Calculation
