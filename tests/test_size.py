@@ -10,7 +10,7 @@ def write_file(path: Path, content: str) -> Path:
 
 
 def test_python_basic_metrics(tmp_path: Path):
-    """Count basic Python lines, comments, ncloc, functions, classes, and comment density."""
+    """Count basic Python lines, comments, sloc, functions, classes, and comment density."""
     test_file = write_file(
         tmp_path / "example.py",
         """
@@ -27,7 +27,7 @@ def hello():
 
     assert result.lines == 6
     assert result.comment_lines == 1
-    assert result.ncloc == 4
+    assert result.sloc == 4
     assert result.functions == 1
     assert result.classes == 0
     assert result.comment_density == 20.0
@@ -47,12 +47,12 @@ text = "hello # still not a comment"
     result = analyze_file(test_file)
 
     assert result.lines == 3
-    assert result.ncloc == 2
+    assert result.sloc == 2
     assert result.comment_lines == 1
 
 
 def test_python_inline_comment(tmp_path: Path):
-    """Ensure an inline Python comment counts as ncloc, not as a comment-only line."""
+    """Ensure an inline Python comment counts as sloc, not as a comment-only line."""
     test_file = write_file(
         tmp_path / "example.py",
         """
@@ -64,7 +64,7 @@ y = 20
     result = analyze_file(test_file)
 
     assert result.lines == 2
-    assert result.ncloc == 2
+    assert result.sloc == 2
     assert result.comment_lines == 0
 
 
@@ -86,7 +86,7 @@ x = 5
 
     assert result.lines == 6
     assert result.comment_lines == 4
-    assert result.ncloc == 1
+    assert result.sloc == 1
 
 
 def test_python_triple_single_quote(tmp_path: Path):
@@ -105,7 +105,7 @@ x = 1
 
     assert result.lines == 4
     assert result.comment_lines == 3
-    assert result.ncloc == 1
+    assert result.sloc == 1
 
 
 def test_python_escaped_quote(tmp_path: Path):
@@ -121,7 +121,7 @@ text = "She said \"hello # not comment\""
     result = analyze_file(test_file)
 
     assert result.lines == 2
-    assert result.ncloc == 1
+    assert result.sloc == 1
     assert result.comment_lines == 1
 
 
@@ -138,7 +138,7 @@ text = '# not a comment'
     result = analyze_file(test_file)
 
     assert result.lines == 2
-    assert result.ncloc == 1
+    assert result.sloc == 1
     assert result.comment_lines == 1
 
 
@@ -158,7 +158,7 @@ const x = 5; // inline comment
 
     assert result.lines == 4
     assert result.comment_lines == 1
-    assert result.ncloc == 3
+    assert result.sloc == 3
     assert result.statements >= 3
 
 
@@ -177,7 +177,7 @@ const x = 5;
 
     assert result.lines == 3
     assert result.comment_lines == 2
-    assert result.ncloc == 2
+    assert result.sloc == 2
 
 
 def test_js_multiline_block_comment(tmp_path: Path):
@@ -197,7 +197,7 @@ const x = 5;
 
     assert result.lines == 5
     assert result.comment_lines == 4
-    assert result.ncloc == 1
+    assert result.sloc == 1
 
 
 def test_js_functions_and_classes(tmp_path: Path):
@@ -225,7 +225,7 @@ const arrow = () => {
 
     assert result.classes >= 1
     assert result.functions >= 2
-    assert result.ncloc > 0
+    assert result.sloc > 0
 
 
 def test_js_template_literal(tmp_path: Path):
@@ -241,7 +241,7 @@ const message = `hello // not comment`;
     result = analyze_file(test_file)
 
     assert result.comment_lines == 0
-    assert result.ncloc == 2
+    assert result.sloc == 2
 
 
 def test_java_comments(tmp_path: Path):
@@ -266,7 +266,7 @@ public class Example {
     assert result.comment_lines == 2
     assert result.classes >= 1
     assert result.functions >= 1
-    assert result.ncloc > 0
+    assert result.sloc > 0
 
 
 def test_java_markers_inside_string(tmp_path: Path):
@@ -284,12 +284,12 @@ public class Example {
     result = analyze_file(test_file)
 
     assert result.comment_lines == 0
-    assert result.ncloc == 4
+    assert result.sloc == 4
     assert result.classes >= 1
 
 
 def test_c_inline_comment(tmp_path: Path):
-    """Ensure a C inline comment counts as ncloc, not as a comment-only line."""
+    """Ensure a C inline comment counts as sloc, not as a comment-only line."""
     test_file = write_file(
         tmp_path / "main.c",
         """
@@ -303,7 +303,7 @@ int main() {
     result = analyze_file(test_file)
 
     assert result.comment_lines == 0
-    assert result.ncloc == 4
+    assert result.sloc == 4
     assert result.statements >= 2
     assert result.functions >= 1
 
@@ -323,7 +323,7 @@ public class Example {
     result = analyze_file(test_file)
 
     assert result.comment_lines == 0
-    assert result.ncloc == 4
+    assert result.sloc == 4
 
 
 def test_html_comments(tmp_path: Path):
@@ -344,7 +344,7 @@ multi-line comment
 
     assert result.lines == 6
     assert result.comment_lines == 4
-    assert result.ncloc == 2
+    assert result.sloc == 2
 
 
 def test_css_comments(tmp_path: Path):
@@ -362,7 +362,7 @@ body {
     result = analyze_file(test_file)
 
     assert result.comment_lines == 1
-    assert result.ncloc == 3
+    assert result.sloc == 3
 
 
 def test_sql_comments(tmp_path: Path):
@@ -380,7 +380,7 @@ SELECT * FROM orders;
     result = analyze_file(test_file)
 
     assert result.comment_lines == 2
-    assert result.ncloc == 2
+    assert result.sloc == 2
     assert result.statements >= 2
 
 
@@ -400,7 +400,7 @@ echo done # inline comment
 
     assert result.lines == 4
     assert result.comment_lines == 2
-    assert result.ncloc == 2
+    assert result.sloc == 2
 
 
 def test_yaml_comments(tmp_path: Path):
@@ -418,7 +418,7 @@ value: "# not comment"
     result = analyze_file(test_file)
 
     assert result.comment_lines == 1
-    assert result.ncloc == 3
+    assert result.sloc == 3
 
 
 def test_ruby_comments(tmp_path: Path):
@@ -436,7 +436,7 @@ x = 5
     result = analyze_file(test_file)
 
     assert result.comment_lines == 3
-    assert result.ncloc == 1
+    assert result.sloc == 1
 
 
 def test_lua_comments(tmp_path: Path):
@@ -455,7 +455,7 @@ local x = 5
     result = analyze_file(test_file)
 
     assert result.comment_lines == 4
-    assert result.ncloc == 1
+    assert result.sloc == 1
 
 
 def test_haskell_comments(tmp_path: Path):
@@ -474,7 +474,7 @@ main = putStrLn "hello"
     result = analyze_file(test_file)
 
     assert result.comment_lines == 4
-    assert result.ncloc == 1
+    assert result.sloc == 1
 
 
 def test_matlab_comments(tmp_path: Path):
@@ -493,7 +493,7 @@ x = 5;
     result = analyze_file(test_file)
 
     assert result.comment_lines == 4
-    assert result.ncloc == 1
+    assert result.sloc == 1
 
 
 def test_repo_aggregation(tmp_path: Path):
@@ -520,7 +520,7 @@ const y = 2;
     assert len(file_results) == 2
     assert repo_result.lines == 4
     assert repo_result.comment_lines == 2
-    assert repo_result.ncloc == 2
+    assert repo_result.sloc == 2
     assert repo_result.comment_density == 50.0
 
 
@@ -561,20 +561,20 @@ def test_empty_file(tmp_path: Path):
     result = analyze_file(test_file)
 
     assert result.lines == 0
-    assert result.ncloc == 0
+    assert result.sloc == 0
     assert result.comment_lines == 0
     assert result.comment_density == 0.0
 
 
 def test_blank_file(tmp_path: Path):
-    """Count blank physical lines without increasing ncloc or comment lines."""
+    """Count blank physical lines without increasing sloc or comment lines."""
     test_file = tmp_path / "blank.py"
     test_file.write_text("\n\n\n", encoding="utf-8")
 
     result = analyze_file(test_file)
 
     assert result.lines == 3
-    assert result.ncloc == 0
+    assert result.sloc == 0
     assert result.comment_lines == 0
     assert result.comment_density == 0.0
 

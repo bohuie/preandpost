@@ -3,7 +3,7 @@ Size metric extraction using a line-based approximation.
 This module analyzes supported source files and computes: 
 - Files 
 - Lines
-- Lines of Code / ncloc (non-commenting lines of code) 
+- Lines of Code / sloc (source lines of code) 
 - Comment lines 
 - Comment density 
 - Statements 
@@ -217,7 +217,7 @@ class FileSizeMetrics:
     file_path: str
     language: str
     lines: int = 0
-    ncloc: int = 0
+    sloc: int = 0
     comment_lines: int = 0
     comment_density: float = 0.0
     statements: int = 0
@@ -231,7 +231,7 @@ class RepositorySizeMetrics:
 
     files: int = 0
     lines: int = 0
-    ncloc: int = 0
+    sloc: int = 0
     comment_lines: int = 0
     comment_density: float = 0.0
     statements: int = 0
@@ -341,7 +341,7 @@ def iter_source_files(root_path: str | Path) -> Iterable[Path]:
 
 
 # ---------------------------------------------------------------------------
-# Comments and ncloc
+# Comments and sloc
 # ---------------------------------------------------------------------------
 
 def mask_strings(line: str) -> str:
@@ -488,7 +488,7 @@ def process_line(line: str, state: ScannerState, comment_style: dict[str, list],
     Processes one line and returns:
         cleaned_code: remaining code after removing comments
         is_comment_line: whether the line should count as comment line
-        has_code: whether the line contains code/ncloc
+        has_code: whether the line contains code/sloc
     """
 
     stripped_line = line.strip()
@@ -528,7 +528,7 @@ def process_line(line: str, state: ScannerState, comment_style: dict[str, list],
         end_index = after_start.find(end_marker)
 
         if end_index == -1:
-            # Code before a block comment still counts as ncloc.
+            # Code before a block comment still counts as sloc.
             state.in_block_comment = True
             state.block_end_marker = end_marker
 
@@ -684,12 +684,12 @@ def analyze_file(file_path: str | Path) -> FileSizeMetrics:
             metrics.comment_lines += 1
 
         if has_code:
-            metrics.ncloc += 1
+            metrics.sloc += 1
             metrics.statements += count_statements(cleaned_code, language)
             metrics.functions += count_functions(cleaned_code, language)
             metrics.classes += count_classes(cleaned_code, language)
 
-    denominator = metrics.ncloc + metrics.comment_lines
+    denominator = metrics.sloc + metrics.comment_lines
     metrics.comment_density = round(
         (metrics.comment_lines / denominator) * 100,
         2,
@@ -716,13 +716,13 @@ def analyze_repository(root_path: str | Path) -> tuple[RepositorySizeMetrics, li
 
         repository_metrics.files += 1
         repository_metrics.lines += metrics.lines
-        repository_metrics.ncloc += metrics.ncloc
+        repository_metrics.sloc += metrics.sloc
         repository_metrics.comment_lines += metrics.comment_lines
         repository_metrics.statements += metrics.statements
         repository_metrics.functions += metrics.functions
         repository_metrics.classes += metrics.classes
 
-    denominator = repository_metrics.ncloc + repository_metrics.comment_lines
+    denominator = repository_metrics.sloc + repository_metrics.comment_lines
     repository_metrics.comment_density = round(
         (repository_metrics.comment_lines / denominator) * 100,
         2,
