@@ -5,7 +5,7 @@ The following metrics are included:
 
 - **Files**: The number of files.
 - **Lines**: The number of physical lines, number of carriage returns.
-- **Lines of Code (`ncloc`)**: The number of physical lines that contain at least one character which is neither a whitespace nor a tabulation nor part of a comment.
+- **Lines of Code (`sloc`)**: The number of physical lines that contain at least one character which is neither a whitespace nor a tabulation nor part of a comment.
 - **Comment Lines**: The number of lines containing either comment or commented-out code.
 - **Comment Density**: The `comment lines density = comment lines / (lines of code + comment lines) * 100`.
 - **Statements**: The number of statements, e.g., `x = 5; y = 10; print(x + y)` which has 3 statements.
@@ -13,27 +13,49 @@ The following metrics are included:
 - **Classes**: The number of classes, including nested classes, interfaces, enums, and annotations.
 
 ## Folder Structure
+
 ```bash
 preandpost/
 ├── src/
-│   ├── clone_repos.py              # Clone repositories for analysis
-│   └── run_size.py                 # Run Size metric detector
+│   ├── clone_repos.py                  # Clone repositories for analysis
+│   ├── run_size.py                     # Run Size metric detector for one repository
 │   └── metrics/
-        ├── __init__.py 
-│       └── size.py                 # Size metric detector
+│       ├── __init__.py
+│       └── size.py                     # Size metric computation logic
 ├── tests/
-│   └── test_size.py                # Unit tests
+│   └── test_size.py                    # Unit tests
 └── data/
-    ├── repos/                       # Cloned repositories 
+    ├── repos/                           # Cloned repositories
     │   ├── <REPO_OWNER_1>/
     │   │   ├── <REPO_NAME_1>/
     │   │   └── <REPO_NAME_2>/
     │   └── <REPO_OWNER_2>/
     │       └── <REPO_NAME_3>/
-    └── outputs/                     # Generated outputs 
+    └── outputs/                         # Generated outputs
         └── size/
-            ├── files_summary.csv    # File-level metrics
-            └── repos_summary.csv    # Repository-level metrics
+            ├── <REPO_OWNER_1>/
+            │   ├── <REPO_NAME_1>.csv    # File-level metrics for one repository
+            │   └── <REPO_NAME_2>.csv
+            └── <REPO_OWNER_2>/
+                └── <REPO_NAME_3>.csv
+```
+
+Example:
+
+```bash
+data/
+├── repos/
+│   ├── COSC-499-W2023/
+│   │   └── year-long-project-team-15/
+│   └── COSC-499-W2025/
+│       └── capstone-project-team-15/
+└── outputs/
+    └── size/
+        ├── COSC-499-W2023/
+        │   └── year-long-project-team-15.csv
+        └── COSC-499-W2025/
+            └── capstone-project-team-15.csv
+
 ```
 
 ## Workflow
@@ -62,7 +84,7 @@ Detect comment style from file extension
 Initialize file-level counters
     ├── lines = 0
     ├── comment_lines = 0
-    ├── ncloc = 0
+    ├── sloc = 0
     ├── statements = 0
     ├── functions = 0
     └── classes = 0
@@ -80,7 +102,7 @@ Check line type
     │   ├── comment_lines += 1
     │   ├── Check whether block comment ends
     │   └── If code remains after the block:
-    │       ├── ncloc += 1
+    │       ├── sloc += 1
     │       └── Count statements, functions, and classes
     │
     ├── New block comment found
@@ -97,28 +119,28 @@ Check line type
     │   ├── If no code appears before the marker:
     │   │   └── comment_lines += 1
     │   └── If code appears before the marker:
-    │       ├── ncloc += 1
+    │       ├── sloc += 1
     │       └── Count statements, functions, and classes
     │
     └── Ordinary code line
-        ├── ncloc += 1
+        ├── sloc += 1
         └── Count statements, functions, and classes
     ↓
 Calculate file-level comment density
-    └── comment_lines / (ncloc + comment_lines) × 100
+    └── comment_lines / (sloc + comment_lines) × 100
     ↓
 Add file-level metrics to repository totals
     ↓
 Repeat for all supported source files
     ↓
 Calculate repository-level comment density
-    └── repo_comment_lines / (repo_ncloc + repo_comment_lines) × 100
+    └── repo_comment_lines / (repo_sloc + repo_comment_lines) × 100
     ↓
 Return results
     ├── files
     ├── lines
     ├── comment_lines
-    ├── ncloc
+    ├── sloc
     ├── comment_density
     ├── statements
     ├── functions
@@ -134,7 +156,7 @@ OUTPUT:
     files
     lines
     comment_lines
-    ncloc
+    sloc
     comment_density
     statements
     functions
@@ -168,7 +190,7 @@ for each file in repository recursively:
 repo_files = 0
 repo_lines = 0
 repo_comment_lines = 0
-repo_ncloc = 0
+repo_sloc = 0
 repo_statements = 0
 repo_functions = 0
 repo_classes = 0
@@ -192,7 +214,7 @@ for each file in source_files:
     initialize:
         file_lines = 0
         file_comment_lines = 0
-        file_ncloc = 0
+        file_sloc = 0
         file_statements = 0
         file_functions = 0
         file_classes = 0
@@ -228,7 +250,7 @@ for each file in source_files:
                 code_after_block = text after block_end_marker
 
                 if code_after_block contains real code:
-                    file_ncloc += 1
+                    file_sloc += 1
                     count statements/functions/classes from code_after_block
 
             continue
@@ -265,7 +287,7 @@ for each file in source_files:
                 remove inline comment from remaining_code
 
                 if remaining_code contains real code:
-                    file_ncloc += 1
+                    file_sloc += 1
                     count statements/functions/classes from remaining_code
 
             else:
@@ -274,7 +296,7 @@ for each file in source_files:
                 block_end_marker = matching_end_marker
 
                 if code_before_block contains real code:
-                    file_ncloc += 1
+                    file_sloc += 1
                     count statements/functions/classes from code_before_block
 
             continue
@@ -295,7 +317,7 @@ for each file in source_files:
                 file_comment_lines += 1
 
             else:
-                file_ncloc += 1
+                file_sloc += 1
                 count statements/functions/classes from code_before_comment
 
             continue
@@ -305,7 +327,7 @@ for each file in source_files:
         CASE 4: ORDINARY CODE LINE
         ----------------------------------------------------
 
-        file_ncloc += 1
+        file_sloc += 1
         count statements/functions/classes from line
 
 
@@ -313,7 +335,7 @@ for each file in source_files:
     3B. CALCULATE FILE COMMENT DENSITY
     --------------------------------------------------------
 
-    denominator = file_ncloc + file_comment_lines
+    denominator = file_sloc + file_comment_lines
 
     if denominator > 0:
         file_comment_density =
@@ -329,7 +351,7 @@ for each file in source_files:
     repo_files += 1
     repo_lines += file_lines
     repo_comment_lines += file_comment_lines
-    repo_ncloc += file_ncloc
+    repo_sloc += file_sloc
     repo_statements += file_statements
     repo_functions += file_functions
     repo_classes += file_classes
@@ -422,7 +444,7 @@ function count_classes(clean_line, language):
 7. CALCULATE REPOSITORY COMMENT DENSITY
 ------------------------------------------------------------
 
-denominator = repo_ncloc + repo_comment_lines
+denominator = repo_sloc + repo_comment_lines
 
 if denominator > 0:
     repo_comment_density =
@@ -439,7 +461,7 @@ return:
     files = repo_files
     lines = repo_lines
     comment_lines = repo_comment_lines
-    ncloc = repo_ncloc
+    sloc = repo_sloc
     comment_density = repo_comment_density
     statements = repo_statements
     functions = repo_functions
@@ -464,13 +486,20 @@ The scanner:
 
 ### `src/run_size.py`
 
-Runs Size metric extraction on the configured cloned repositories.
+Runs Size metric extraction for one configured cloned repository at a time.
 
-Generated outputs:
+The script reads the selected `REPO_OWNER` and `REPO_NAME`, analyzes all supported source files in that repository, and generates one file-level CSV.
+
+Generated output:
 
 ```text
-data/outputs/size/files_summary.csv
-data/outputs/size/repos_summary.csv
+data/outputs/size/<REPO_OWNER>/<REPO_NAME>.csv
+```
+
+Example:
+
+```text
+data/outputs/size/COSC-499-W2023/year-long-project-team-15.csv
 ```
 
 ### `tests/test_size.py`
@@ -481,7 +510,7 @@ Adds unit tests for:
 - String masking;
 - Inline and multi-line comments;
 - Escaped quotes;
-- `ncloc`;
+- `sloc`;
 - Statement, function, and class detection;
 - Repository-level aggregation;
 - Skipped folders and unsupported files;
@@ -494,8 +523,8 @@ Adds unit tests for:
 | Files | Number of supported source files analyzed |
 | Lines | Number of physical lines, including blank and comment lines |
 | Comment Lines | Number of comment-only lines and block-comment lines |
-| Lines of Code (`ncloc`) | Number of physical lines containing active code |
-| Comment Density | `comment_lines / (ncloc + comment_lines) * 100` |
+| Lines of Code (`sloc`) | Number of physical lines containing active code |
+| Comment Density | `comment_lines / (sloc + comment_lines) * 100` |
 | Statements | Count based on executable lines or semicolons, depending on the language |
 | Functions | Count using language-specific regex patterns |
 | Classes | Count of class declarations using language-specific regex patterns |
@@ -509,18 +538,18 @@ x = 7  # initialize the value
 ```
 Output:
 ```bash
-ncloc = 1
+sloc = 1
 comment_lines = 0
 ```
 
-- A line containing both a block comment and active code can contribute to both `comment_lines` and `ncloc`.
+- A line containing both a block comment and active code can contribute to both `comment_lines` and `sloc`.
 For example:
 ```bash
 x = 7; '''initialize the value'''
 ```
 Output:
 ```bash
-ncloc = 1
+sloc = 1
 comment_lines = 1
 ```
 
@@ -657,7 +686,7 @@ For each file:
     return comment_lines
 ```
 
-## Lines of Code/ncloc
+## Lines of Code/sloc
 ```bash
 For each file:
 
@@ -667,7 +696,7 @@ For each file:
     detect comment style based on file extension
 
     init:
-        ncloc = 0
+        sloc = 0
         in_block_comment = False
         block_end_marker = None
 
@@ -691,7 +720,7 @@ For each file:
             text_after_block = remove inline comment from text_after_block
 
             if text_after_block contains real code:
-                ncloc += 1
+                sloc += 1
 
             continue
 
@@ -711,7 +740,7 @@ For each file:
                 remaining_code = remove inline comment from remaining_code
 
                 if remaining_code contains real code:
-                    ncloc += 1
+                    sloc += 1
 
             else:
                 # Comment continues onto the next line
@@ -721,7 +750,7 @@ For each file:
                 code_before_block = remove inline comment from code_before_block
 
                 if code_before_block contains real code:
-                    ncloc += 1
+                    sloc += 1
 
             continue
 
@@ -735,16 +764,16 @@ For each file:
 
             if code_before_comment contains real code:
                 # Example: x = 5  # explanation
-                ncloc += 1
+                sloc += 1
 
             # If there is no code before marker, line is comment-only
             continue
 
         # CASE 4: Ordinary code line
         if line contains real code:
-            ncloc += 1
+            sloc += 1
 
-    return ncloc
+    return sloc
 ```
 
 ## Functions
@@ -960,7 +989,7 @@ For each file:
 
     initialize:
         comment_lines = 0
-        ncloc = 0
+        sloc = 0
 
     for each line in file:
 
@@ -977,23 +1006,23 @@ For each file:
             comment_lines += 1
 
             if remaining code exists before or after the block comment:
-                ncloc += 1
+                sloc += 1
 
             continue
 
         if line contains active code:
-            ncloc += 1
+            sloc += 1
 
             # Inline comments are not counted separately as comment lines.
             # Example:
             # x = 5  # explanation
             #
             # This line contributes:
-            # ncloc += 1
+            # sloc += 1
             # comment_lines += 0
 
 
-    denominator = ncloc + comment_lines
+    denominator = sloc + comment_lines
 
     if denominator > 0:
         comment_density =
