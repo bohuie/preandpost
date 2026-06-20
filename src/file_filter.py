@@ -5,7 +5,8 @@ SKIP_FOLDER = {".git", ".github", ".idea", ".vscode", "__pycache__", "node_modul
 }
 
 SKIP_FILE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".gif", ".svg", ".pdf", ".zip", ".class", ".md", ".txt",
-    ".csv", ".json", ".xml", ".yml", ".yaml", ".lock", ".log", ".ico", ".exe", ".dll", ".so", ".dylib", ".docx",
+    ".csv", ".json", ".yml", ".yaml", ".lock", ".log", ".ico", ".exe", ".dll", ".so", ".dylib", ".docx",
+    ".jar", ".mp4", ".aar", ".bat",
 }
 
 def should_include_file(file_path: str) -> bool:

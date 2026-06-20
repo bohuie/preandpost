@@ -8,7 +8,7 @@ import json
 from src.ollama.prompts import SIZE_METRICS_PROMPT
 from src.ollama.ollama_client import ask_ollama
 
-file_path = "data/UBCO-COSC499-Winter-2018-Term-1-2/file_content/project-1-crm-for-non-profits-trellis-crm.json"
+file_path = "data/UBCO-COSC499-Winter-2018-Term-1-2/file_content/project-12-bus-advisory-offline-real-time-bus-location-tracker.json"
 
 with open(file_path, "r", encoding="utf-8") as file:
     repo_data = json.load(file)     # Read the contents of a json file, then convert it into a Python dictionary
