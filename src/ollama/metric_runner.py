@@ -13,7 +13,7 @@ EXTRACTED_PATH = (
     "file_content/project-1-crm-for-non-profits-trellis-crm.json"
 )
 
-CHUNK_SIZE = 3
+CHUNK_SIZE = 1
 
 
 def make_chunks(files: list[dict]) -> list[list[dict]]:
