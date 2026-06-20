@@ -9,7 +9,7 @@ import requests
 
 
 OLLAMA_URL = "http://localhost:11434/api/generate"
-MODEL_NAME = "llama3.1:latest"
+MODEL_NAME = "qwen2.5-coder:7b"
 
 
 def ask_ollama(prompt: str) -> str:     # The program sends a prompt to the local Ollama
