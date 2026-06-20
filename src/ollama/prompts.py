@@ -154,7 +154,7 @@ INPUT JSON:
 
 
 # =========================
-# FILE COUNT
+# FILES
 # =========================
 
 FILES_PROMPT = """
@@ -164,14 +164,14 @@ Count how many source code files are in this chunk.
 
 INPUT JSON STRUCTURE
 - chunk_index: which chunk this is (informational only)
-- path_count: number of paths in this chunk
-- paths: list of file path strings
+- filename_count: number of filenames in this chunk
+- filenames: list of filename strings
 
 YOUR TASK
-Return the total number of entries in the `paths` list as an integer.
+Return the total number of entries in the `filenames` list as an integer.
 
 DEFINITION
-- files: Integer equal to the length of the `paths` list.
+- files: Integer equal to the length of the `filenames` list.
 
 RULES
 - Output JSON ONLY.
@@ -190,7 +190,7 @@ INPUT JSON:
 
 
 # =========================
-# PHYSICAL LINES
+# LINES
 # =========================
 
 LINES_PROMPT = """
@@ -208,10 +208,18 @@ Return ONE result per input file, preserving the original order.
 Keep the exact `path` value from the input.
 
 DEFINITION
-- lines: Total number of physical newline-separated lines in the file.
-- Include code lines.
-- Include comment lines.
-- Include blank lines.
+- lines: Total physical lines in the file, equivalent to
+  Python's len(content.splitlines()).
+- Treat `\\n` (LF) and `\\r\\n` (CRLF) as one line break each.
+- A trailing newline does NOT add an extra empty line.
+- Include code lines, comment lines, and blank lines.
+
+EXAMPLES
+- ""            → 0
+- "abc"         → 1
+- "a\\nb\\nc"   → 3
+- "a\\nb\\n"    → 2
+- "\\n\\n\\n"   → 3
 
 RULES
 - Count carefully for each file.

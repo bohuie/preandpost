@@ -127,29 +127,29 @@ def run_aggregate_metric(
         extracted = json.load(file)
 
     repository = extracted["repository"]
-    chunks = make_chunks(extracted["paths"], chunk_size)
+    chunks = make_chunks(extracted["filenames"], chunk_size)
     if top_n > 0:
         chunks = chunks[:top_n]
 
-    print(f"Repository   : {repository}")
-    print(f"Metric       : {metric}")
-    print(f"Total paths  : {len(extracted['paths'])}")
-    print(f"Total chunks : {len(chunks)}\n")
+    print(f"Repository      : {repository}")
+    print(f"Metric          : {metric}")
+    print(f"Total filenames : {len(extracted['filenames'])}")
+    print(f"Total chunks    : {len(chunks)}\n")
 
     total = 0
 
     for index, chunk in enumerate(chunks, start=1):
         payload = {
             "chunk_index": index,
-            "path_count": len(chunk),
-            "paths": chunk,
+            "filename_count": len(chunk),
+            "filenames": chunk,
         }
 
         prompt = prompt_template.format(
             chunk_json=json.dumps(payload, ensure_ascii=False)
         )
 
-        print(f"[{index}/{len(chunks)}] Counting {len(chunk)} path(s)...")
+        print(f"[{index}/{len(chunks)}] Counting {len(chunk)} filename(s)...")
 
         try:
             raw = ask_ollama(prompt)

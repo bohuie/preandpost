@@ -3,7 +3,7 @@ from src.extractors.extract_file_content import extract_files
 from datetime import datetime
 from pathlib import Path
 
-json_path = ("/Users/aliyahnurdafika/Documents/preandpost/data/UBCO-COSC499-Winter-2018-Term-1-2/project-1-crm-for-non-profits-trellis-crm.json")
+json_path = ("/content/preandpost/data/UBCO-COSC499-Winter-2018-Term-1-2/project-1-crm-for-non-profits-trellis-crm.json")
 
 with open(json_path, "r", encoding="utf-8") as f:
     repo_data = json.load(f)
@@ -29,7 +29,7 @@ with open(json_path, "r", encoding="utf-8") as f:
         "repository": output["repository"],
         "default_branch": output["default_branch"],
         "file_count": output["file_count"],
-        "paths": [item["path"] for item in files],
+        "filenames": [Path(item["path"]).name for item in files],
         "extracted_at": output["extracted_at"],
     }
 
@@ -38,7 +38,5 @@ with open(json_path, "r", encoding="utf-8") as f:
 
     with open(file_list_path, "w", encoding="utf-8") as f:
         json.dump(file_list_output, f, indent=2)
-
-# Run: python -m src.run_extract_file_content
 
 # Run: python -m src.run_extract_file_content
