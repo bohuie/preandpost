@@ -160,34 +160,26 @@ INPUT JSON:
 FILES_PROMPT = """
 You are a source-code metrics analyzer.
 
-For EACH file in the chunk below, return the file-count metric as JSON.
+Count how many source code files are in this chunk.
 
 INPUT JSON STRUCTURE
 - chunk_index: which chunk this is (informational only)
-- file_count: number of files in this chunk
-- files: list of {{path, extension, content}}
+- path_count: number of paths in this chunk
+- paths: list of file path strings
 
 YOUR TASK
-Return ONE result per input file, preserving the original order.
-Keep the exact `path` value from the input.
+Return the total number of entries in the `paths` list as an integer.
 
 DEFINITION
-- files: Always return 1 for each file because each result represents one file.
+- files: Integer equal to the length of the `paths` list.
 
 RULES
-- Return one result for every file.
-- Preserve the original file order.
 - Output JSON ONLY.
 - Do not include prose, markdown fences, or explanations.
 
 OUTPUT SCHEMA:
 {{
-  "files": [
-    {{
-      "path": "<file path>",
-      "files": 1
-    }}
-  ]
+  "files": <integer>
 }}
 
 Begin your response with `{{` and end with `}}`. NOTHING ELSE.

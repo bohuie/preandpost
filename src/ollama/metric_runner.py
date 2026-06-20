@@ -13,13 +13,17 @@ EXTRACTED_PATH = (
     "file_content/project-1-crm-for-non-profits-trellis-crm.json"
 )
 
-CHUNK_SIZE = 1
+FILE_LIST_PATH = (
+    "data/UBCO-COSC499-Winter-2018-Term-1-2/"
+    "file_list/project-1-crm-for-non-profits-trellis-crm.json"
+)
 
-
-def make_chunks(files: list[dict]) -> list[list[dict]]:
+def make_chunks(files: list[dict], chunk_size: int) -> list[list[dict]]:
+    if chunk_size <= 0:
+        return [files]
     return [
-        files[index:index + CHUNK_SIZE]
-        for index in range(0, len(files), CHUNK_SIZE)
+        files[index:index + chunk_size]
+        for index in range(0, len(files), chunk_size)
     ]
 
 
@@ -58,12 +62,19 @@ def save_metric_result(
     return output_path
 
 
-def run_metric(metric: str, prompt_template: str) -> None:
+def run_metric(
+    metric: str,
+    prompt_template: str,
+    chunk_size: int = 3,
+    top_n: int = 0,
+) -> None:
     with open(EXTRACTED_PATH, "r", encoding="utf-8") as file:
         extracted = json.load(file)
 
     repository = extracted["repository"]
-    chunks = make_chunks(extracted["files"])
+    chunks = make_chunks(extracted["files"], chunk_size)
+    if top_n > 0:
+        chunks = chunks[:top_n]
     rows = []
 
     print(f"Repository   : {repository}")
@@ -103,4 +114,56 @@ def run_metric(metric: str, prompt_template: str) -> None:
     print("-------")
     print(f"Files analyzed : {len(rows)}")
     print(f"Total {metric} : {total:g}")
+    print(f"Saved result   : {result_path}")
+
+
+def run_aggregate_metric(
+    metric: str,
+    prompt_template: str,
+    chunk_size: int = 0,
+    top_n: int = 0,
+) -> None:
+    with open(FILE_LIST_PATH, "r", encoding="utf-8") as file:
+        extracted = json.load(file)
+
+    repository = extracted["repository"]
+    chunks = make_chunks(extracted["paths"], chunk_size)
+    if top_n > 0:
+        chunks = chunks[:top_n]
+
+    print(f"Repository   : {repository}")
+    print(f"Metric       : {metric}")
+    print(f"Total paths  : {len(extracted['paths'])}")
+    print(f"Total chunks : {len(chunks)}\n")
+
+    total = 0
+
+    for index, chunk in enumerate(chunks, start=1):
+        payload = {
+            "chunk_index": index,
+            "path_count": len(chunk),
+            "paths": chunk,
+        }
+
+        prompt = prompt_template.format(
+            chunk_json=json.dumps(payload, ensure_ascii=False)
+        )
+
+        print(f"[{index}/{len(chunks)}] Counting {len(chunk)} path(s)...")
+
+        try:
+            raw = ask_ollama(prompt)
+            value = int(json.loads(raw)[metric])
+        except Exception as error:
+            print(f"  FAILED: {error}")
+            continue
+
+        total += value
+        print(f"  chunk {index}: {value}")
+
+    result_path = save_metric_result(repository, metric, {metric: total})
+
+    print("\nSummary")
+    print("-------")
+    print(f"Total {metric} : {total}")
     print(f"Saved result   : {result_path}")

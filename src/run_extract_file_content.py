@@ -24,4 +24,21 @@ with open(json_path, "r", encoding="utf-8") as f:
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(output, f, indent = 2)
 
+    file_list_output = {
+        "owner": output["owner"],
+        "repository": output["repository"],
+        "default_branch": output["default_branch"],
+        "file_count": output["file_count"],
+        "paths": [item["path"] for item in files],
+        "extracted_at": output["extracted_at"],
+    }
+
+    file_list_path = (Path("data")/output["owner"]/"file_list"/f"{output['repository']}.json")
+    file_list_path.parent.mkdir(parents=True, exist_ok=True)
+
+    with open(file_list_path, "w", encoding="utf-8") as f:
+        json.dump(file_list_output, f, indent=2)
+
+# Run: python -m src.run_extract_file_content
+
 # Run: python -m src.run_extract_file_content
