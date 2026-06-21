@@ -9,9 +9,6 @@ from pathlib import Path
 import requests
 from dotenv import load_dotenv
 
-from src.file_filter import SKIP_FOLDER, should_include_file
-
-
 load_dotenv()
 
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
@@ -41,7 +38,7 @@ class GithubClient:
     def _base(self, owner: str, repo: str) -> str:
         """Build the base API URL for one repository."""
         return f"{self.BASE_URL}/repos/{owner}/{repo}"
-
+    
     def _get(
         self,
         url: str,
@@ -74,8 +71,6 @@ class GithubClient:
             return response.json()
 
         response.raise_for_status()
-
-
 
     def _get_all_pages(
         self,
@@ -110,8 +105,6 @@ class GithubClient:
 
         return results
 
-
-
     def _fetch_tree_refs(
         self,
         base: str,
@@ -138,9 +131,6 @@ class GithubClient:
             )
 
             if item["type"] == "tree":
-                if item["path"].lower() in SKIP_FOLDER:
-                    continue
-
                 files.extend(
                     self._fetch_tree_refs(
                         base=base,
@@ -149,10 +139,7 @@ class GithubClient:
                     )
                 )
 
-            elif (
-                item["type"] == "blob"
-                and should_include_file(item_path)
-            ):
+            elif item["type"] == "blob":
                 files.append(
                     {
                         "file_path": item_path,

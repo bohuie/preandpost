@@ -9,7 +9,7 @@ from pathlib import Path
 
 REPOSITORY = "project-1-crm-for-non-profits-trellis-crm"
 RESULT_DIR = Path("data") / "metric_results" / REPOSITORY
-OUTPUT_DIR = Path("data") / "size_metrics"
+OUTPUT_DIR = Path("output") / "size_metrics"
 
 METRICS = [
     "files",

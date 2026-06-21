@@ -3,7 +3,7 @@ from src.extractors.extract_file_content import extract_files
 from datetime import datetime
 from pathlib import Path
 
-json_path = ("/content/preandpost/data/UBCO-COSC499-Winter-2018-Term-1-2/project-1-crm-for-non-profits-trellis-crm.json")
+json_path = ("/Users/aliyahnurdafika/Documents/preandpost/data/UBCO-COSC499-Winter-2018-Term-1-2/project-1-crm-for-non-profits-trellis-crm.json")
 
 with open(json_path, "r", encoding="utf-8") as f:
     repo_data = json.load(f)

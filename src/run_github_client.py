@@ -14,8 +14,8 @@ if not token:
 client = GithubClient(token=token)
 
 data = client.fetch_full(
-    owner="UBCO-COSC499-Summer-2020",
-    repo="dietary-management-tool-dietary-management-tool",
+    owner="UBCO-COSC499-Winter-2018-Term-1-2",
+    repo="project-8-ar-vr-experience-team-8-ar-vr",
 )
 
 output_path = client.save_repository_json(data)

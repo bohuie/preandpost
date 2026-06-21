@@ -2,6 +2,7 @@
 Shared workflow used by every run_<metric>.py script.
 """
 
+import csv
 import json
 from pathlib import Path
 
@@ -62,6 +63,34 @@ def save_metric_result(
     return output_path
 
 
+def save_metric_csv(
+    repository: str,
+    metric: str,
+    data,
+) -> Path:
+    output_dir = Path("output") / "metric_results" / repository
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    output_path = output_dir / f"{metric}.csv"
+
+    with open(output_path, "w", encoding="utf-8", newline="") as file:
+        if isinstance(data, list):
+            # Per-file metric: rows of {path, <metric>}
+            fieldnames = ["path", metric]
+            writer = csv.DictWriter(file, fieldnames=fieldnames)
+            writer.writeheader()
+            for row in data:
+                writer.writerow({k: row.get(k, "") for k in fieldnames})
+        elif isinstance(data, dict):
+            # Aggregate metric: single row of {<metric>: total}
+            fieldnames = list(data.keys())
+            writer = csv.DictWriter(file, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerow(data)
+
+    return output_path
+
+
 def run_metric(
     metric: str,
     prompt_template: str,
@@ -95,11 +124,15 @@ def run_metric(
 
         print(f"[{index}/{len(chunks)}] Analyzing {len(chunk)} file(s)...")
 
+        raw = None
         try:
             raw = ask_ollama(prompt)
             chunk_rows = parse_response(raw, metric)
         except Exception as error:
             print(f"  FAILED: {error}")
+            print(f"  FILES IN CHUNK: {[f['path'] for f in chunk]}")
+            if raw is not None:
+                print(f"  RAW (first 500 chars): {raw[:500]!r}")
             continue
 
         rows.extend(chunk_rows)
@@ -108,13 +141,15 @@ def run_metric(
             print(f"  {row['path']}: {row[metric]}")
 
     result_path = save_metric_result(repository, metric, rows)
+    csv_path = save_metric_csv(repository, metric, rows)
     total = sum(float(row[metric]) for row in rows)
 
     print("\nSummary")
     print("-------")
     print(f"Files analyzed : {len(rows)}")
     print(f"Total {metric} : {total:g}")
-    print(f"Saved result   : {result_path}")
+    print(f"Saved JSON     : {result_path}")
+    print(f"Saved CSV      : {csv_path}")
 
 
 def run_aggregate_metric(
@@ -162,8 +197,10 @@ def run_aggregate_metric(
         print(f"  chunk {index}: {value}")
 
     result_path = save_metric_result(repository, metric, {metric: total})
+    csv_path = save_metric_csv(repository, metric, {metric: total})
 
     print("\nSummary")
     print("-------")
     print(f"Total {metric} : {total}")
-    print(f"Saved result   : {result_path}")
+    print(f"Saved JSON     : {result_path}")
+    print(f"Saved CSV      : {csv_path}")
