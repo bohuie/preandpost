@@ -371,7 +371,9 @@ class GithubClient:
     ) -> str:
         """Save one report to data/{owner}/{repository}.json."""
         output_directory = os.path.join(
-            "data",
+            "/Users/aliyahnurdafika/Library/CloudStorage",
+            "OneDrive-UBC",
+            "File Hui, Bowen - repo data",
             repository_data["owner"],
         )
 
