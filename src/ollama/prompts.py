@@ -154,7 +154,7 @@ INPUT JSON:
 
 
 # =========================
-# FILES
+# FILE COUNT
 # =========================
 
 FILES_PROMPT = """
@@ -194,50 +194,47 @@ INPUT JSON:
 # =========================
 
 LINES_PROMPT = """
-You are a source-code metrics analyzer.
+You are a deterministic line counter for source code files.
 
-For EACH file in the chunk below, calculate its physical line count.
+Input is the pre-computed AST analysis of a repository.
+Each file has already been split into one or more chunks by an upstream parser.
+Your only job is to derive the file's total physical line count from those chunks.
 
 INPUT JSON STRUCTURE
-- chunk_index: which chunk this is (informational only)
-- file_count: number of files in this chunk
-- files: list of {{path, extension, content}}
+- chunk_index: informational only
+- file_count: number of files in this batch
+- files: list of objects, each containing:
+  - path: file path string
+  - chunks: list of {{start_line, end_line}} pairs (1-indexed, inclusive)
 
-YOUR TASK
-Return ONE result per input file, preserving the original order.
-Keep the exact `path` value from the input.
+TASK
+For EACH file, return its `lines` value.
 
-DEFINITION
-- lines: Total physical lines in the file, equivalent to
-  Python's len(content.splitlines()).
-- Treat `\\n` (LF) and `\\r\\n` (CRLF) as one line break each.
-- A trailing newline does NOT add an extra empty line.
-- Include code lines, comment lines, and blank lines.
+ALGORITHM
+- A file's `lines` equals the MAXIMUM `end_line` across its `chunks`.
+- Chunks of one file are sequential and cover the entire file from line 1
+  up to the file's last line, so the largest `end_line` IS the line count.
+- If a file's `chunks` list is empty, return 0 for that file.
 
-EXAMPLES
-- ""            → 0
-- "abc"         → 1
-- "a\\nb\\nc"   → 3
-- "a\\nb\\n"    → 2
-- "\\n\\n\\n"   → 3
+VALIDATION
+- Return EXACTLY one result per input file.
+- Preserve the input order.
+- Keep each `path` value byte-for-byte identical to the input.
 
-RULES
-- Count carefully for each file.
-- If a file is empty, return 0.
-- Output JSON ONLY.
-- Do not include prose, markdown fences, or explanations.
+OUTPUT RULES
+- Output valid JSON only.
+- No prose, no markdown fences, no comments, no explanations.
+- Begin with `{{` and end with `}}`.
 
-OUTPUT SCHEMA:
+OUTPUT SCHEMA
 {{
   "files": [
     {{
-      "path": "<file path>",
+      "path": "<exact input path>",
       "lines": <integer>
     }}
   ]
 }}
-
-Begin your response with `{{` and end with `}}`. NOTHING ELSE.
 
 INPUT JSON:
 {chunk_json}
