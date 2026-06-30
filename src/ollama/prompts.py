@@ -1,188 +1,37 @@
-SIZE_METRICS_PROMPT = """You are a source-code metrics analyzer.
-
-Analyze the extracted-files JSON below (a list of source code files from
-one repository) and return REPOSITORY-LEVEL Size metrics as JSON.
-
-INPUT JSON STRUCTURE
-The input has these top-level fields:
-•⁠  ⁠owner: repository owner
-•⁠  ⁠repository: repository name
-•⁠  ⁠default_branch: branch the snapshot is from
-•⁠  ⁠file_count: number of files in the list
-•⁠  ⁠files: list of {{path, extension, content}}
-
-YOUR TASK
-For each file in ⁠ files ⁠, count Lines, NCLOC, Comment Lines, Statements,
-Functions, Classes. Then AGGREGATE across all files to get the repository
-total.
-
-DEFINITIONS (based on SonarQube standard):
-
-1.⁠ ⁠files
-   Total number of source code files analyzed.
-   Equal to the length of ⁠ files ⁠ list.
-
-2.⁠ ⁠lines
-   Sum of physical lines across all files (count newline-separated lines).
-   Include blank lines and comment lines.
-
-3.⁠ ⁠ncloc (Non-Comment Lines of Code)
-   Sum of lines that contain at least one code character across all files.
-   EXCLUDE blank lines.
-   EXCLUDE lines that contain only comments.
-   INCLUDE lines that contain code with an inline comment after it.
-
-4.⁠ ⁠comment_lines
-   Sum of lines containing only comments OR commented-out code.
-   INCLUDE lines inside multi-line / block comments / docstrings.
-   EXCLUDE blank lines and pure decoration lines (e.g. **).
-
-5.⁠ ⁠comment_density_pct
-   Formula: comment_lines / (ncloc + comment_lines) * 100
-   If (ncloc + comment_lines) == 0, return 0.0.
-
-6.⁠ ⁠statements
-   Sum of executable or declarative statements across all files.
-   Includes assignments, function calls, returns, conditionals,
-   loops, declarations, imports.
-
-7.⁠ ⁠functions
-   Sum of function or method definitions across all files.
-   Language hints: Python ⁠ def ⁠, JS/TS ⁠ function ⁠ / arrow / class methods,
-   Java methods, Go ⁠ func ⁠, Ruby ⁠ def ⁠, PHP ⁠ function ⁠.
-
-8.⁠ ⁠classes
-   Sum of class definitions (and interfaces, enums, annotations
-   if the language has them) across all files.
-
-RULES
-•⁠  ⁠Count carefully across ALL files in the list, not just the first few.
-•⁠  ⁠If a file is empty or unparseable, treat all its counts as zero.
-•⁠  ⁠Output JSON ONLY. No prose, no markdown fences, no explanation about how you compute that metrics or values. ONLY SHOW OUTPUT SCHEMA
-•  Do NOT SHOW the introduction explanation, for example: Here is the output JSON with repository-level size metrics: . JUST
-    GIVE OUTPUT SCHEMA with no additional information
-
-OUTPUT SCHEMA (exact keys, integers except comment_density_pct which is float):
-{{
-  "files": <integer>,
-  "lines": <integer>,
-  "ncloc": <integer>,
-  "comment_lines": <integer>,
-  "comment_density_pct": <float>,
-  "statements": <integer>,
-  "functions": <integer>,
-  "classes": <integer>
-}}
-
-INPUT JSON:
-{file_content_json}
-"""
-
-
-SIZE_METRIC_CHUNK_PROMPT = """You are a source-code metrics analyzer.
-
-For EACH file in the chunk below, return its Size metrics as JSON.
-
-INPUT JSON STRUCTURE
-- chunk_index: which chunk this is (informational only)
-- file_count: number of files in this chunk
-- files: list of {{path, extension, content}}
-
-YOUR TASK
-For each file in `files`, count Lines, NCLOC, Comment Lines, Statements,
-Functions, Classes. Return ONE result per file, preserving the order
-in `files`. Keep the exact `path` string from the input so the caller
-can match.
-
-DEFINITIONS (based on SonarQube standard):
-
-1. lines
-   Physical lines in the file (count newline-separated lines).
-   Include blank lines and comment lines.
-
-2. ncloc (Non-Comment Lines of Code)
-   Lines with at least one code character.
-   EXCLUDE blank lines.
-   EXCLUDE lines that contain only comments.
-   INCLUDE lines that contain code with an inline comment after it.
-
-3. comment_lines
-   Lines containing only comments OR commented-out code.
-   INCLUDE lines inside multi-line / block comments / docstrings.
-   EXCLUDE blank lines and pure decoration lines (e.g. ******).
-
-4. statements
-   Executable or declarative statements: assignments, function calls,
-   returns, conditionals, loops, declarations, imports.
-
-5. functions
-   Function or method definitions.
-   Language hints: Python `def`, JS/TS `function` / arrow / class methods,
-   Java methods, Go `func`, Ruby `def`, PHP `function`.
-
-6. classes
-   Class definitions (and interfaces, enums, annotations if the
-   language has them).
-
-RULES
-- Count carefully for each file.
-- If a file is empty or unparseable, return zeros for that file.
-- Output JSON ONLY. No prose, no markdown fences, no explanation.
-
-OUTPUT SCHEMA (exact keys, one entry per file, preserving input order):
-{{
-  "files": [
-    {{
-      "path": "<file path>",
-      "lines": <integer>,
-      "ncloc": <integer>,
-      "comment_lines": <integer>,
-      "statements": <integer>,
-      "functions": <integer>,
-      "classes": <integer>
-    }}
-  ]
-}}
-
-REMINDER: Begin your response with `{{` and end with `}}`. NOTHING ELSE.
-No prose, no markdown fences, no explanation.
-
-INPUT JSON:
-{chunk_json}
-"""
-
-
-
 # =========================
 # FILE COUNT
 # =========================
 
 FILES_PROMPT = """
-You are a source-code metrics analyzer.
+You are a deterministic source-file counter.
 
-Count how many source code files are in this chunk.
+The input contains one batch of source-code file paths.
 
 INPUT JSON STRUCTURE
-- chunk_index: which chunk this is (informational only)
-- filename_count: number of filenames in this chunk
-- filenames: list of filename strings
+- chunk_index: batch position, informational only
+- path_count: number of path entries in this batch
+- paths: list of complete source-file path strings
 
-YOUR TASK
-Return the total number of entries in the `filenames` list as an integer.
-
-DEFINITION
-- files: Integer equal to the length of the `filenames` list.
+TASK
+Count the number of entries in the `paths` JSON array.
 
 RULES
-- Output JSON ONLY.
-- Do not include prose, markdown fences, or explanations.
+1. Each string in `paths` represents exactly one source-code file.
+2. Count every entry, even if two paths have the same filename.
+3. Do not inspect or interpret the path strings.
+4. Do not count folders separately.
+5. Do not remove duplicates.
+6. The result must equal the number of elements in `paths`.
+7. If `paths` is empty, return 0.
+8. Return valid JSON only.
+9. Do not include prose, markdown fences, comments, or explanations.
 
-OUTPUT SCHEMA:
+OUTPUT SCHEMA
 {{
-  "files": <integer>
+  "files": <non-negative integer>
 }}
 
-Begin your response with `{{` and end with `}}`. NOTHING ELSE.
+Begin with `{{` and end with `}}`.
 
 INPUT JSON:
 {chunk_json}
@@ -194,49 +43,97 @@ INPUT JSON:
 # =========================
 
 LINES_PROMPT = """
-You are a deterministic line counter for source code files.
+You are a deterministic source-code chunk line counter.
 
-Input is the pre-computed AST analysis of a repository.
-Each file has already been split into one or more chunks by an upstream parser.
-Your only job is to derive the file's total physical line count from those chunks.
+Each input chunk contains a `physical_lines` array.
 
-INPUT JSON STRUCTURE
-- chunk_index: informational only
-- file_count: number of files in this batch
-- files: list of objects, each containing:
-  - path: file path string
-  - chunks: list of {{start_line, end_line}} pairs (1-indexed, inclusive)
+Every object in `physical_lines` represents exactly one physical line.
+Each object contains:
+
+- `line_number`: the line's sequential position within the current chunk
+- `text`: the source-code text on that physical line
+
+The numbering starts at 1 for every chunk and increases sequentially
+without gaps.
 
 TASK
-For EACH file, return its `lines` value.
 
-ALGORITHM
-- A file's `lines` equals the MAXIMUM `end_line` across its `chunks`.
-- Chunks of one file are sequential and cover the entire file from line 1
-  up to the file's last line, so the largest `end_line` IS the line count.
-- If a file's `chunks` list is empty, return 0 for that file.
+For each chunk:
+
+1. If `physical_lines` is empty, return `lines` as 0.
+
+2. Otherwise, find the largest `line_number` in `physical_lines`.
+
+3. Return that largest `line_number` as `lines`.
+
+Do not count source-code statements.
+Do not classify code, comments, or blank lines.
+Do not count newline characters.
+Do not count array punctuation.
+Do not add 1 to the largest line number.
+Do not subtract 1 from the largest line number.
+
+The `text` value is informational only.
+A line whose `text` is empty or whitespace-only is still represented by
+its own `line_number`.
+
+EXAMPLES
+
+Input physical lines:
+
+[
+  {{"line_number": 1, "text": "code"}},
+  {{"line_number": 2, "text": ""}},
+  {{"line_number": 3, "text": "// comment"}}
+]
+
+The largest `line_number` is 3.
+Therefore, return:
+
+{{
+  "lines": 3
+}}
+
+If the last object has:
+
+{{
+  "line_number": 57,
+  "text": "?>"
+}}
+
+return exactly 57, not 56 and not 58.
 
 VALIDATION
-- Return EXACTLY one result per input file.
+
+- Return exactly one result for each input chunk.
 - Preserve the input order.
-- Keep each `path` value byte-for-byte identical to the input.
+- Preserve `path` exactly.
+- Preserve `file_chunk_index` exactly.
+- `lines` must equal the maximum `line_number`.
+- Never infer the answer from the source-code content.
 
 OUTPUT RULES
-- Output valid JSON only.
-- No prose, no markdown fences, no comments, no explanations.
+
+- Return valid JSON only.
+- No prose.
+- No markdown fences.
+- No explanations.
 - Begin with `{{` and end with `}}`.
 
 OUTPUT SCHEMA
+
 {{
-  "files": [
+  "chunks": [
     {{
       "path": "<exact input path>",
+      "file_chunk_index": <integer>,
       "lines": <integer>
     }}
   ]
 }}
 
 INPUT JSON:
+
 {chunk_json}
 """
 
