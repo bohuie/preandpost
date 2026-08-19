@@ -22,8 +22,9 @@ def load_chart_data(line_metrics, rating_metric=None):
         rating_columns = [f"{rating_metric}_{grade}" for grade in GRADES]
         data[rating_columns] = data[rating_columns].apply(pd.to_numeric, errors="coerce").fillna(0)
         rating_data = data.groupby("year")[rating_columns].sum()
+        yearly_totals = rating_data.sum(axis=1).replace(0, 1)
         rating_counts = {
-            grade: list(rating_data[f"{rating_metric}_{grade}"])
+            grade: list(rating_data[f"{rating_metric}_{grade}"] / yearly_totals * 100)
             for grade in GRADES
         }
 

@@ -4,12 +4,14 @@ from matplotlib.ticker import MultipleLocator
 
 from src.graphs.data import load_chart_data
 from src.graphs.style import (
-    draw_ai_line, draw_lines, draw_rating_bars, save_chart, max_line_value,
+    apply_piecewise_scale, draw_ai_line, draw_lines,
+    draw_rating_bars, save_chart, max_line_value,
 )
 
 
 def chart(title, line_metrics, line_labels, y_label, output_file,
-          rating_metric=None, y_tick_interval=None):
+          rating_metric=None, y_tick_interval=None,
+          custom_ticks=None, linear=False):
     years, line_values, rating_counts = load_chart_data(line_metrics, rating_metric)
     x = np.arange(len(years))
 
@@ -22,18 +24,33 @@ def chart(title, line_metrics, line_labels, y_label, output_file,
 
     if rating_metric:
         draw_rating_bars(ax_main, x, rating_counts)
-        ax_main.set_ylabel("Number of teams")
-        ax_main.set_ylim(0, ax_main.get_ylim()[1] * 1.2)
+        ax_main.set_ylabel("Percentage of teams (%)")
+        ax_main.set_ylim(0, 100)
         ax_line = ax_main.twinx()
     else:
         ax_line = ax_main
+        if custom_ticks is not None:
+            positives = [v for values in line_values.values() for v in values if v > 0]
+            ylim = (min(positives) * 0.7, custom_ticks[-1] * 1.05) if positives else None
+            apply_piecewise_scale(ax_line, custom_ticks, ylim=ylim)
+        elif not linear:
+            ax_line.set_yscale("log")
 
     draw_lines(ax_line, x, line_metrics, line_labels, line_values)
     ax_line.set_ylabel(y_label)
-    ax_line.set_ylim(0, max_line_value(line_values) * 1.35)
 
-    if y_tick_interval is not None:
-        ax_line.yaxis.set_major_locator(MultipleLocator(y_tick_interval))
+    if rating_metric:
+        ax_line.set_ylim(0, max_line_value(line_values) * 1.35)
+        if y_tick_interval is not None:
+            ax_line.yaxis.set_major_locator(MultipleLocator(y_tick_interval))
+    elif custom_ticks is not None:
+        pass
+    elif linear:
+        ax_line.set_ylim(0, max_line_value(line_values) * 1.35)
+    else:
+        positive_values = [v for values in line_values.values() for v in values if v > 0]
+        if positive_values:
+            ax_line.set_ylim(min(positive_values) * 0.3, max(positive_values) * 4)
 
     draw_ai_line(ax_main, years)
 

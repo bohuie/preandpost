@@ -20,16 +20,17 @@ CATEGORIES = {
     "Duplications": {
         "line_metrics": ["duplicated_lines_density", "duplicated_lines", "duplicated_blocks", "duplicated_files"],
         "y_label": "Average duplication metrics per repo",
-        "y_tick_interval": 250,
+        "custom_ticks": [10, 50, 100, 500, 1000, 1500, 2000, 3000],
     },
     "Size": {
         "line_metrics": ["ncloc", "lines", "statements", "functions", "classes", "files", "comment_lines", "comment_lines_density"],
         "y_label": "Average size metrics per repo",
-        "y_tick_interval": 4000,
+        "custom_ticks": [10, 100, 1000, 25000, 50000],
     },
     "Complexity": {
         "line_metrics": ["complexity", "cognitive_complexity"],
         "y_label": "Average complexity per repo",
+        "linear": True,
     },
 }
 
@@ -55,6 +56,8 @@ def main():
             output_file=f"{title.lower()}.png",
             rating_metric=config.get("rating_metric"),
             y_tick_interval=config.get("y_tick_interval"),
+            custom_ticks=config.get("custom_ticks"),
+            linear=config.get("linear", False),
         )
 
 
